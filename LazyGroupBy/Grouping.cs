@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Shastra.LazyGroupBy
 {
-    public class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
+    internal class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
     {
         private readonly IEnumerable<TElement> _elements;
 
         public TKey Key { get; private set; }
 
-        public Grouping(TKey key, IEnumerable<TElement> elements)
+        internal Grouping(TKey key, IEnumerable<TElement> elements)
         {
             Key = key;
             _elements = elements;

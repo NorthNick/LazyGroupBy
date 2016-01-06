@@ -9,19 +9,21 @@ namespace Shastra.LazyGroupBy
         private readonly IEnumerator<TElement> _enumerator;
         private readonly object _lock = new object();
 
-        private bool IsEnumerated { get; set; }
+        private bool Incomplete { get; set; }
 
         internal ListBackedEnumerable(IEnumerator<TElement> enumerator)
         {
             _enumerator = enumerator;
+            Incomplete = true;
         }
 
         public IEnumerator<TElement> GetEnumerator()
         {
-            if (IsEnumerated) {
-                return _elements.GetEnumerator();
-            } else {
+            if (Incomplete) {
                 return new ListBackedEnumerator(this);
+            }
+            else {
+                return _elements.GetEnumerator();
             }
         }
 
@@ -32,7 +34,7 @@ namespace Shastra.LazyGroupBy
 
         public void Enumerate()
         {
-            while (!IsEnumerated) {
+            while (Incomplete) {
                 FetchNext(_elements.Count);
             }
         }
@@ -44,12 +46,12 @@ namespace Shastra.LazyGroupBy
                     // Although enumeratedElements < _elements.Count is always false when this is called, another thread may grab the
                     // lock and add an element first, so this needs to be rechecked.
                     return true;
-                } else if (IsEnumerated) {
+                } else if (!Incomplete) {
                     return false;
                 } else {
-                    IsEnumerated = _enumerator.MoveNext();
-                    if (!IsEnumerated) _elements.Add(_enumerator.Current);
-                    return IsEnumerated;
+                    Incomplete = _enumerator.MoveNext();
+                    if (Incomplete) _elements.Add(_enumerator.Current);
+                    return Incomplete;
                 }
             }
         }

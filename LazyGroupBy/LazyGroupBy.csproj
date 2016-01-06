@@ -35,7 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Grouping.cs" />
-    <Compile Include="IdentityFunction.cs" />
     <Compile Include="LazyGroupByExtensions.cs" />
     <Compile Include="LazyGroupedEnumerable.cs" />
     <Compile Include="ListBackedEnumerable.cs" />

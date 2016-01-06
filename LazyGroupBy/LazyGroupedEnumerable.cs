@@ -6,12 +6,11 @@ namespace Shastra.LazyGroupBy
 {
     internal class LazyGroupedEnumerable<TSource, TKey, TElement, TResult> : IEnumerable<TResult>
     {
-        private readonly IEnumerator<TSource> _source;
+        private readonly IEnumerable<TSource> _source;
         private readonly Func<TSource, TKey> _keySelector;
         private readonly Func<TSource, TElement> _elementSelector;
         private readonly IEqualityComparer<TKey> _comparer;
         private readonly Func<TKey, IEnumerable<TElement>, TResult> _resultSelector;
-        private bool _sourceIncomplete;
 
         public LazyGroupedEnumerable(IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         {
@@ -23,7 +22,7 @@ namespace Shastra.LazyGroupBy
                 throw new ArgumentNullException("elementSelector");
             if (resultSelector == null)
                 throw new ArgumentNullException("resultSelector");
-            _source = source.GetEnumerator();
+            _source = source;
             _keySelector = keySelector;
             _elementSelector = elementSelector;
             _comparer = comparer ?? EqualityComparer<TKey>.Default;
@@ -32,27 +31,34 @@ namespace Shastra.LazyGroupBy
 
         public IEnumerator<TResult> GetEnumerator()
         {
-            _sourceIncomplete = _source.MoveNext();
-            while (_sourceIncomplete) {
-                var key = _keySelector(_source.Current);
-                var group = new ListBackedEnumerable<TElement>(SameKey(key).GetEnumerator());
+            var source = _source.GetEnumerator();
+            // We cannot use a simple bool here because it's modified within SameKey and iterator functions cannot take ref arguments
+            BoolStruct sourceIncomplete = new BoolStruct {Value = source.MoveNext()};
+            while (sourceIncomplete.Value) {
+                var key = _keySelector(source.Current);
+                var group = new ListBackedEnumerable<TElement>(SameKey(key, source, sourceIncomplete).GetEnumerator());
                 yield return _resultSelector(key, group);
                 // Make sure we move on to the next key
                 group.Enumerate();
             }
         }
 
-        private IEnumerable<TElement> SameKey(TKey key)
+        private IEnumerable<TElement> SameKey(TKey key, IEnumerator<TSource> source, BoolStruct sourceIncomplete)
         {
             do {
-                yield return _elementSelector(_source.Current);
-                _sourceIncomplete =_source.MoveNext();
-            } while (_sourceIncomplete && _comparer.Equals(key, _keySelector(_source.Current)));
+                yield return _elementSelector(source.Current);
+                sourceIncomplete.Value = source.MoveNext();
+            } while (sourceIncomplete.Value && _comparer.Equals(key, _keySelector(source.Current)));
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private class BoolStruct
+        {
+            public bool Value;
         }
     }
 }

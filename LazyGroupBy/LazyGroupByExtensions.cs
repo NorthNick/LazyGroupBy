@@ -9,12 +9,12 @@ namespace Shastra.LazyGroupBy
 
         public static IEnumerable<IGrouping<TKey, TSource>> LazyGroupBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
         {
-            return new LazyGroupedEnumerable<TSource, TKey, TSource, IGrouping<TKey, TSource>>(source, keySelector, IdentityFunction<TSource>.Instance, DefaultResultSelector, null);
+            return new LazyGroupedEnumerable<TSource, TKey, TSource, IGrouping<TKey, TSource>>(source, keySelector, Identity, DefaultResultSelector, null);
         }
 
         public static IEnumerable<IGrouping<TKey, TSource>> LazyGroupBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, IEqualityComparer<TKey> comparer)
         {
-            return new LazyGroupedEnumerable<TSource, TKey, TSource, IGrouping<TKey, TSource>>(source, keySelector, IdentityFunction<TSource>.Instance, DefaultResultSelector, comparer);
+            return new LazyGroupedEnumerable<TSource, TKey, TSource, IGrouping<TKey, TSource>>(source, keySelector, Identity, DefaultResultSelector, comparer);
         }
 
         public static IEnumerable<IGrouping<TKey, TElement>> LazyGroupBy<TSource, TKey, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector)
@@ -29,7 +29,7 @@ namespace Shastra.LazyGroupBy
         
         public static IEnumerable<TResult> LazyGroupBy<TSource, TKey, TResult>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector)
         {
-            return new LazyGroupedEnumerable<TSource, TKey, TSource, TResult>(source, keySelector, IdentityFunction<TSource>.Instance, resultSelector, null);
+            return new LazyGroupedEnumerable<TSource, TKey, TSource, TResult>(source, keySelector, Identity, resultSelector, null);
         }
 
         public static IEnumerable<TResult> LazyGroupBy<TSource, TKey, TElement, TResult>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector)
@@ -39,7 +39,7 @@ namespace Shastra.LazyGroupBy
 
         public static IEnumerable<TResult> LazyGroupBy<TSource, TKey, TResult>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TKey, IEnumerable<TSource>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
         {
-            return new LazyGroupedEnumerable<TSource, TKey, TSource, TResult>(source, keySelector, IdentityFunction<TSource>.Instance, resultSelector, comparer);
+            return new LazyGroupedEnumerable<TSource, TKey, TSource, TResult>(source, keySelector, Identity, resultSelector, comparer);
         }
 
         public static IEnumerable<TResult> LazyGroupBy<TSource, TKey, TElement, TResult>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, Func<TKey, IEnumerable<TElement>, TResult> resultSelector, IEqualityComparer<TKey> comparer)
@@ -50,6 +50,11 @@ namespace Shastra.LazyGroupBy
         private static IGrouping<TKey, TElement> DefaultResultSelector<TKey, TElement>(TKey key, IEnumerable<TElement> elements)
         {
             return new Grouping<TKey, TElement>(key, elements);
+        }
+
+        private static TSource Identity<TSource>(TSource x)
+        {
+            return x;
         }
     }
 }
