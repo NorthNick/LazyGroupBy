@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LazyGroupBy
+namespace Shastra.LazyGroupBy
 {
     public static class LazyGroupByExtensions
     {

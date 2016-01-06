@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LazyGroupBy
+namespace Shastra.LazyGroupBy
 {
     internal class IdentityFunction<TElement>
     {

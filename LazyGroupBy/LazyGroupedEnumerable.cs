@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace LazyGroupBy
+namespace Shastra.LazyGroupBy
 {
     internal class LazyGroupedEnumerable<TSource, TKey, TElement, TResult> : IEnumerable<TResult>
     {
