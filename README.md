@@ -10,4 +10,4 @@ LazyGroupBy behaves just like GroupBy, except that it assumes that all values fo
 so it can output results lazily. If one key's objects are scattered throughout the source, then the results will contain one
 grouping for each contiguous group.
 
-LazyGroupBy is a work in progress. It currently contains code that compiles but has not been tested.
+LazyGroupBy is a work in progress. It currently contains code that compiles but has not been fully tested.
