@@ -50,8 +50,10 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ElementSelectorTests.cs" />
     <Compile Include="GroupingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultSelectorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

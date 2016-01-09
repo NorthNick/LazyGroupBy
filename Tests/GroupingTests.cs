@@ -49,6 +49,13 @@ namespace Tests
             Assert.That(actual, Is.EqualTo(Integers().First()));
         }
 
+        [Test]
+        public void LazyMultiGroupTest()
+        {
+            var actual = Integers().LazyGroupBy(x => x / 10);
+            Assert.That(actual.Skip(1).First(), Is.EqualTo(Enumerable.Range(10, 10)));
+        }
+
         private static IEnumerable<int> Integers()
         {
             int val = 0;
