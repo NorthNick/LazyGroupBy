@@ -19,12 +19,7 @@ namespace Shastra.LazyGroupBy
 
         public IEnumerator<TElement> GetEnumerator()
         {
-            if (Incomplete) {
-                return new ListBackedEnumerator(this);
-            }
-            else {
-                return _elements.GetEnumerator();
-            }
+            return Incomplete ? (IEnumerator<TElement>) new ListBackedEnumerator(this) : _elements.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
