@@ -10,3 +10,15 @@ LazyGroupBy behaves just like GroupBy, except that it assumes that all values fo
 so it can output results lazily. If one key's objects are scattered throughout the source, then the results will contain one
 grouping for each contiguous group.
 
+## Installation
+The simplest way to use LazygroupBy is to take a copy of the LazyGroupBy project, compile it up to create the Shastra.LazyGroupBy
+assembly, and add a reference in your project. Adding a "using Shastra.LazyGroupBy" statement in your code will then give access
+to the LazyGroupBy method, which has exactly the same signatures as the usual groupBy one.
+
+## Implementation
+LazyGroupBy is written in C# 5, so can be compiled with any recent Visual Studio edition. It comes with a test project, using
+NUnit 3. Code is not pushed to GitHub unless all tests pass successfully.
+
+The LazyGroupBy project contains fewer than 100 lines of code, so documentation is sparse. The only point of difficulty is the
+ListBackedEnumerable class, in which there are some subtleties to ensure that multiple iterators on the same IGrouping see the
+same results.
