@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Shastra.LazyGroupBy
@@ -19,7 +20,7 @@ namespace Shastra.LazyGroupBy
 
         public IEnumerator<TElement> GetEnumerator()
         {
-            return Incomplete ? (IEnumerator<TElement>) new ListBackedEnumerator(this) : _elements.GetEnumerator();
+            return Incomplete ? (IEnumerator<TElement>) new ListBackedEnumerator(FetchItem) : _elements.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -29,45 +30,53 @@ namespace Shastra.LazyGroupBy
 
         public void Enumerate()
         {
+            var dummy = default(TElement);
             while (Incomplete) {
-                FetchNext(_elements.Count);
+                FetchItem(_elements.Count, ref dummy);
             }
         }
 
-        private bool FetchNext(int enumeratedElements)
+        private delegate bool FetchItemDelegate(int index, ref TElement value);
+
+        private bool FetchItem(int index, ref TElement value)
         {
-            lock (_lock) {
-                if (enumeratedElements < _elements.Count) {
-                    // Although enumeratedElements < _elements.Count is always false when this is called, another thread may grab the
-                    // lock and add an element first, so this needs to be rechecked.
-                    return true;
-                } else if (!Incomplete) {
-                    return false;
-                } else {
-                    Incomplete = _enumerator.MoveNext();
-                    if (Incomplete) _elements.Add(_enumerator.Current);
-                    return Incomplete;
+            // Another thread may modify the variables being tested can change during the test, but not in a way that
+            // leads to incorrect results.
+            if (index >= _elements.Count && Incomplete) {
+                lock (_lock) {
+                    // Need double-checking here in case another thread grabs the lock after the first check.
+                    if (index >= _elements.Count && Incomplete) {
+                        Incomplete = _enumerator.MoveNext();
+                        if (Incomplete) _elements.Add(_enumerator.Current);
+                    }
                 }
+            }
+            
+            if (index < _elements.Count) {
+                value = _elements[index];
+                return true;
+            } else {
+                return false;
             }
         }
 
         private class ListBackedEnumerator : IEnumerator<TElement>
         {
-            private readonly ListBackedEnumerable<TElement> _base;
-            private int _enumeratedElements = 0;
+            private readonly FetchItemDelegate _fetcher;
+            private int _nextIndex = 0;
+            private TElement _current;
 
-            public ListBackedEnumerator(ListBackedEnumerable<TElement> @base)
+            public ListBackedEnumerator(FetchItemDelegate fetcher)
             {
-                _base = @base;
+                _fetcher = fetcher;
             }
 
             public void Dispose() {}
 
             public bool MoveNext()
             {
-                if (_enumeratedElements < _base._elements.Count || _base.FetchNext(_enumeratedElements)) {
-                    Current = _base._elements[_enumeratedElements];
-                    _enumeratedElements++;
+                if (_fetcher(_nextIndex, ref _current)) {
+                    _nextIndex++;
                     return true;
                 } else {
                     return false;
@@ -76,15 +85,12 @@ namespace Shastra.LazyGroupBy
 
             public void Reset()
             {
-                _enumeratedElements = 0;
+                _nextIndex = 0;
             }
 
-            public TElement Current { get; private set; }
+            public TElement Current { get { return _current; } }
 
-            object IEnumerator.Current
-            {
-                get { return Current; }
-            }
+            object IEnumerator.Current { get { return _current; } }
         }
     }
 }
