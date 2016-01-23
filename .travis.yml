@@ -1,2 +1,5 @@
 language: csharp
 solution: LazyGroupBy.sln
+
+notifications:
+  slack: shastra:68EJin6Gh1Lo8FzKfeQs52Vp
