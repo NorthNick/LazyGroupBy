@@ -2,10 +2,10 @@ language: csharp
 solution: LazyGroupBy.sln
 install:
   - nuget restore LazyGroupBy.sln
-  - nuget install NUnit.Runners -Version 3.0.1 -OutputDirectory testrunner
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release LazyGroupBy.sln
-  - mono ./testrunner/NUnit.Runners.3.0.1/tools/nunit-console.exe ./Tests/bin/Release/Tests.dll
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Tests/bin/Release/Tests.dll
  
 notifications:
   slack: shastra:68EJin6Gh1Lo8FzKfeQs52Vp
