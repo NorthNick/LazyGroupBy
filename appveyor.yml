@@ -1,0 +1,13 @@
+configuration:
+  - Release
+  - Debug
+
+before_build:
+  nuget restore LazyGroupBy.sln
+
+build:
+  project: LazyGroupBy.sln
+
+test:
+  assemblies:
+    - Tests.dll
