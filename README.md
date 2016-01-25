@@ -1,7 +1,7 @@
 # LazyGroupBy
 A lazier version of the .NET LINQ GroupBy function
 
-[![Build Status](https://travis-ci.org/NorthNick/LazyGroupBy.svg?branch=master)](https://travis-ci.org/NorthNick/LazyGroupBy)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/NorthNick/Transducers.Net?branch=master&svg=true)](https://ci.appveyor.com/project/NorthNick/transducers-net)
 
 The .NET LINQ [GroupBy](https://msdn.microsoft.com/en-us/library/system.linq.enumerable.groupby(v=vs.100).aspx) function is
 handy but, in order to to get exactly one group per key value, it eagerly consumes its source enumerable, converting it to a
